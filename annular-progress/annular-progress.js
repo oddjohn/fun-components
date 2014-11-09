@@ -6,8 +6,8 @@
             width: 0,
             fcolor: '#5ab1ef',
             unfcolor: '#ccc',
-            total: 100,
-            finished: 0,
+            max: 100,
+            value: 0,
             textColor: null,
             fontSize: 20,
             fontStyle: 'normal',
@@ -27,9 +27,9 @@
         ctx.fillStyle = o.textColor || o.fcolor;
         var showText = '';
         if (typeof o.textFormatter == 'function') {
-            showText = o.textFormatter(o.total, o.finished);
+            showText = o.textFormatter(o.max, o.value);
         } else {
-            showText =  Math.round(o.finished / o.total * 100) + '%';
+            showText =  Math.round(o.value / o.max * 100) + '%';
         }
         
         ctx.fillText(showText, position, position);
@@ -62,25 +62,25 @@
                 ctx.lineWidth = opts.lineWidth;
                 ctx.strokeStyle = opts.fcolor;
                 var startAngle = -(Math.PI / 2);
-                var finishedRate = opts.finished / opts.total;
+                var valueRate = opts.value / opts.max;
                 var radius = (width - opts.lineWidth) / 2;
 
-                if (finishedRate === 1) {
+                if (valueRate === 1) {
                     ctx.beginPath(); 
                     ctx.arc(position, position, radius, 0, Math.PI*2, true);
                     ctx.stroke();
                     ctx.closePath();
                 } else {
-                    var finishedEndAngle = startAngle - Math.PI * 2 * finishedRate;
-                    //开始绘制finished进度
+                    var valueEndAngle = startAngle - Math.PI * 2 * valueRate;
+                    //开始绘制value进度
                     ctx.beginPath(); 
-                    ctx.arc(position, position, radius, startAngle, finishedEndAngle, true);
+                    ctx.arc(position, position, radius, startAngle, valueEndAngle, true);
                     
                     ctx.stroke();
-                    // 开始绘制unfinished进度
+                    // 开始绘制unvalue进度
                     ctx.beginPath();
                     ctx.strokeStyle = opts.unfcolor; 
-                    ctx.arc(position, position, radius, finishedEndAngle, startAngle, true);
+                    ctx.arc(position, position, radius, valueEndAngle, startAngle, true);
                     ctx.stroke();
                     //结束绘制
                     ctx.closePath();
