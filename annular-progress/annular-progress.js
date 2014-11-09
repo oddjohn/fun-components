@@ -1,4 +1,4 @@
-(function () {
+(function (global) {
     function Annular (options) {
         this.opts = {
             targetDom: document.body,
@@ -49,41 +49,61 @@
                 var wrapper = typeof opts.targetDom == 'string'
                             ? document.getElementById(opts.targetDom)
                             : opts.targetDom;
+                wrapper.innerHTML = '';
                 wrapper.appendChild(canvas);
+                global.G_vmlCanvasManager && global.G_vmlCanvasManager.initElement(canvas);
             } 
             
             if (canvas.getContext) {
                 var ctx = canvas.getContext('2d');
                 //清空canvas现有内容。
                 ctx.clearRect(0, 0, width, width);
-                //绘制文本
-                renderText(ctx, opts);
+                
 
                 ctx.lineWidth = opts.lineWidth;
                 ctx.strokeStyle = opts.fcolor;
+                
                 var startAngle = -(Math.PI / 2);
                 var valueRate = opts.value / opts.max;
-                var radius = (width - opts.lineWidth) / 2;
+                // var radius = (width - opts.lineWidth) / 2;
+                //内圆半径
+                var r = width / 2 - opts.lineWidth;
+                //外圆半径
+                var radius = width / 2;
 
                 if (valueRate === 1) {
-                    ctx.beginPath(); 
+                    ctx.beginPath();
                     ctx.arc(position, position, radius, 0, Math.PI*2, true);
-                    ctx.stroke();
+                    ctx.arc(position, position, r, 0, Math.PI*2, true);
+                    ctx.fill();
                     ctx.closePath();
                 } else {
                     var valueEndAngle = startAngle - Math.PI * 2 * valueRate;
                     //开始绘制value进度
-                    ctx.beginPath(); 
+                    ctx.beginPath();
+                    ctx.fillStyle = opts.fcolor;
                     ctx.arc(position, position, radius, startAngle, valueEndAngle, true);
-                    
-                    ctx.stroke();
+                    ctx.lineTo(position, position);
+                    ctx.fill();
+                    // ctx.closePath();
                     // 开始绘制unvalue进度
                     ctx.beginPath();
-                    ctx.strokeStyle = opts.unfcolor; 
+                    ctx.fillStyle = opts.unfcolor; 
                     ctx.arc(position, position, radius, valueEndAngle, startAngle, true);
-                    ctx.stroke();
+                    ctx.lineTo(position, position);
+                    ctx.fill();
+                    // ctx.closePath();
+
+
+                    ctx.beginPath();
+                    ctx.arc(position, position, r, 0, Math.PI*2, true);
+                    ctx.fillStyle = '#fff';
+                    ctx.fill();
                     //结束绘制
                     ctx.closePath();
+
+                    //绘制文本
+                    renderText(ctx, opts);
                 }
                 
             } else {
@@ -126,8 +146,8 @@
         return 'an-' + counter++;
     };
 
-    window.annular = function (options) {
+    global.annular = function (options) {
         return new Annular(options);
     };
     return annular;
-})(window)
+})(window);
