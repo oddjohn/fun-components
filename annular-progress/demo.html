@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>annular-progress demo</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<script type="text/javascript" src="annular-progress.js"></script>
+<style>
+    div {
+        float: left;
+        margin: 0 20px;
+    }
+	#container {
+		width: 100px;
+		height: 100px;
+	}
+</style>
+</head>
+<body>
+<div id="container"></div>
+<div id="container1"></div>
+<script>
+    var an = annular({
+        targetDom: 'container',
+        radius: ['10px', '20px'],
+        width: 100,
+        value: {
+            total: 100,
+            finished: 1
+        }
+    });
+    an.render();
+    var finished = 1;
+    function change() {
+        if (finished < 100) {
+            setTimeout(function () {
+                an.setValue(100, finished);
+                change();
+            }, 30);
+            finished++;
+        }
+        else {
+           finished = 1;
+           change();
+        }
+    }
+    change();
+    var an1 = annular({
+        targetDom: 'container1',
+        radius: ['10px', '20px'],
+        width: 100,
+        fcolor: '#D87A80',
+        value: {
+            total: 100,
+            finished: 55
+        }
+    });
+    an1.render();
+</script>
+</body>
+</html>
