@@ -13,31 +13,35 @@
         float: left;
         margin: 0 20px;
     }
-	#container {
+	#demo, #demo1 {
 		width: 100px;
 		height: 100px;
 	}
+    #demo2 {
+        width: 333px;
+        height: 333px;
+    }
 </style>
 </head>
 <body>
-<div id="container"></div>
-<div id="container1"></div>
+<div id="demo"></div>
+<div id="demo1"></div>
+<div id="demo2"></div>
 <script>
     var an = annular({
-        targetDom: 'container',
-        radius: ['10px', '20px'],
+        targetDom: 'demo',
         width: 100,
-        value: {
-            total: 100,
-            finished: 1
-        }
+        total: 100,
+        finished: 1
     });
     an.render();
     var finished = 1;
     function change() {
         if (finished < 100) {
             setTimeout(function () {
-                an.setValue(100, finished);
+                an.setOptions({
+                    finished: finished
+                });
                 change();
             }, 30);
             finished++;
@@ -49,16 +53,52 @@
     }
     change();
     var an1 = annular({
-        targetDom: 'container1',
-        radius: ['10px', '20px'],
-        width: 100,
-        fcolor: '#D87A80',
-        value: {
-            total: 100,
-            finished: 55
-        }
+        targetDom: 'demo1',
+        width: 100, //圆环的直径
+        lineWidth: 20, //环的宽
+        fcolor: '#D87A80', //已完成颜色
+        unfcolor: '#ccc', //为完成颜色
+        total: 373, //总数
+        finished: 277, //已完成数
+        //字体设置同css font属性设置
+        // fontStyle: 'italic',
+        // textColor: '#5ab1ef',
+        // fontSize: 20,
+        // fontFamily: 'Arial',
+        // fontWeight: 'Bold',
     });
     an1.render();
+    
+    var an2 = annular({
+        targetDom: 'demo2',
+        width: 333,
+        lineWidth: 50,
+        fcolor: '#FFB980',
+        total: 373,
+        finished: 199,
+        fontSize: 50,
+        textFormatter: function (total, finished) {
+            return finished + '/' + total;
+        }
+    });
+    an2.render();
+    var demo2 = 1;
+    function testDemo2() {
+        if (demo2 < 373) {
+            setTimeout(function () {
+                an2.setOptions({
+                    finished: demo2
+                });
+                testDemo2();
+            }, 10);
+            demo2++;
+        }
+        else {
+           demo2 = 1;
+           testDemo2();
+        }
+    }
+    testDemo2();
 </script>
 </body>
 </html>

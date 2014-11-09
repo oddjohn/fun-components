@@ -6,19 +6,39 @@
             width: 0,
             fcolor: '#5ab1ef',
             unfcolor: '#ccc',
-            value: {
-                total: 100,
-                finished: 0
-            }
-
+            total: 100,
+            finished: 0,
+            textColor: null,
+            fontSize: 20,
+            fontStyle: 'normal',
+            fontFamily: 'Arial',
+            fontWeight: 'Bold',
+            textFormatter: null
         };
         lib.extend(this.opts, options);
     }
 
+    function renderText (ctx, opts) {
+        var o = opts;
+        var position = o.width / 2;
+        ctx.font = o.fontStyle + ' ' + o.fontWeight + ' ' + o.fontSize + 'px ' + o.fontFamily;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = o.textColor || o.fcolor;
+        var showText = '';
+        if (typeof o.textFormatter == 'function') {
+            showText = o.textFormatter(o.total, o.finished);
+        } else {
+            showText =  Math.round(o.finished / o.total * 100) + '%';
+        }
+        
+        ctx.fillText(showText, position, position);
+    }
     Annular.prototype = {
         render: function () {
             var opts = this.opts;
-            var width = opts.width
+            var width = opts.width;
+            var position = width / 2;
             var canvas;
             if (this.getCanvas()) {
                 canvas = this.getCanvas();
@@ -36,27 +56,31 @@
                 var ctx = canvas.getContext('2d');
                 //清空canvas现有内容。
                 ctx.clearRect(0, 0, width, width);
+                //绘制文本
+                renderText(ctx, opts);
 
                 ctx.lineWidth = opts.lineWidth;
                 ctx.strokeStyle = opts.fcolor;
                 var startAngle = -(Math.PI / 2);
-                var finishedRate = opts.value.finished / opts.value.total;
+                var finishedRate = opts.finished / opts.total;
+                var radius = (width - opts.lineWidth) / 2;
+
                 if (finishedRate === 1) {
                     ctx.beginPath(); 
-                    ctx.arc(50, 50, 40, 0, Math.PI*2, true);
+                    ctx.arc(position, position, radius, 0, Math.PI*2, true);
                     ctx.stroke();
                     ctx.closePath();
                 } else {
                     var finishedEndAngle = startAngle - Math.PI * 2 * finishedRate;
                     //开始绘制finished进度
                     ctx.beginPath(); 
-                    ctx.arc(50, 50, 40, startAngle, finishedEndAngle, true);
+                    ctx.arc(position, position, radius, startAngle, finishedEndAngle, true);
                     
                     ctx.stroke();
                     // 开始绘制unfinished进度
                     ctx.beginPath();
                     ctx.strokeStyle = opts.unfcolor; 
-                    ctx.arc(50, 50, 40, finishedEndAngle, startAngle, true);
+                    ctx.arc(position, position, radius, finishedEndAngle, startAngle, true);
                     ctx.stroke();
                     //结束绘制
                     ctx.closePath();
@@ -67,13 +91,8 @@
             }
             
         },
-        setValue: function (total, finished) {
-            lib.extend(this.opts, {
-                value: {
-                    total: total,
-                    finished: finished
-                }
-            });
+        setOptions: function (options) {
+            lib.extend(this.opts, options);
             this.render();
         },
         getCanvas: function () {
