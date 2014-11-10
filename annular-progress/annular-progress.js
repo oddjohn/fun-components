@@ -22,11 +22,11 @@
         var o = opts;
         var position = o.width / 2;
         ctx.font = o.fontStyle + ' ' + o.fontWeight + ' ' + o.fontSize + 'px ' + o.fontFamily;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.fillStyle = o.textColor || o.fcolor;
         var showText = '';
-        if (typeof o.textFormatter == 'function') {
+        if (typeof o.textFormatter === 'function') {
             showText = o.textFormatter(o.max, o.value);
         } else {
             showText =  Math.round(o.value / o.max * 100) + '%';
@@ -39,14 +39,14 @@
             var opts = this.opts;
             var width = opts.width;
             var position = width / 2;
-            var canvas;
+            var canvas, ctx;
             if (this.getCanvas()) {
                 canvas = this.getCanvas();
             } else {
                 canvas = document.createElement('canvas');
                 canvas.id = this.id = lib.getGUID();
                 canvas.width = canvas.height = width;
-                var wrapper = typeof opts.targetDom == 'string'
+                var wrapper = typeof opts.targetDom === 'string'
                             ? document.getElementById(opts.targetDom)
                             : opts.targetDom;
                 wrapper.innerHTML = '';
@@ -55,7 +55,7 @@
             } 
             
             if (canvas.getContext) {
-                var ctx = canvas.getContext('2d');
+                ctx = canvas.getContext('2d');
                 //清空canvas现有内容。
                 ctx.clearRect(0, 0, width, width);
                 
@@ -102,6 +102,42 @@
                     //结束绘制
                     ctx.closePath();
 
+                    //excanvas fillText扩展
+                    if (!ctx.fillText) {
+                        lib.extend(ctx, {
+                            measureText: function(textToDraw) {  
+                                var hiddenSpan = document.createElement('span');  
+                                hiddenSpan.style.font = this.font;  
+                                hiddenSpan.innerHTML = textToDraw;  
+                                var bodyNode = document.getElementsByTagName('body')[0];  
+                                bodyNode.appendChild(hiddenSpan);  
+                                var width = hiddenSpan.offsetWidth;  
+                                bodyNode.removeChild(hiddenSpan);
+                                return {'width' : width};
+                            },
+                            
+                            fillText: function(textToDraw, x, y) {  
+                                var vmlStr = [];
+                                if (!this.textHeight) {
+                                    var textHeightStr = this.font.split(' ')[2];
+                                    this.textHeight = +textHeightStr.replace('px', '') + 2;
+                                }
+                                var textWidth = this.measureText(textToDraw).width; 
+                                vmlStr.push('<g_vml_:shape style="font:' + this.font + ';',  
+                                              ' color:' + this.fillStyle + ';',  
+                                              ' position:absolute;',  
+                                              ' left:' + (x - textWidth / 2) + 'px;',  
+                                              ' top:' + (y - this.textHeight / 2) + 'px;',  
+                                              ' width:' + textWidth + 'px;',  
+                                              ' height:' + this.textHeight + 'px;"',  
+                                              ' ><g_vml_:textbox inset="0,0,0,0">' + textToDraw,  
+                                              ' </g_vml_:textbox>',  
+                                              '</g_vml_:shape>'); 
+                              
+                                this.element_.insertAdjacentHTML('BeforeEnd', vmlStr.join(''));  
+                            }
+                        });
+                    }
                     //绘制文本
                     renderText(ctx, opts);
                 }
@@ -146,8 +182,16 @@
         return 'an-' + counter++;
     };
 
-    global.annular = function (options) {
+    var annular = function (options) {
         return new Annular(options);
     };
-    return annular;
+
+    if ( typeof define === 'function' && define.amd ) {
+        define('annular', [], function() {
+            return annular;
+        });
+    } else {
+        global.annular = annular;
+    }
+
 })(window);
