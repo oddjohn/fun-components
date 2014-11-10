@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>annular-progress demo</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<!--[if IE]><script type="text/javascript" src="../dep/excanvas/excanvas.compiled.js"></script><![endif]-->
+<script type="text/javascript" src="../dep/require.js"></script>
+<!--<script type="text/javascript" src="annular-progress.js"></script>-->
+<style>
+    div {
+        float: left;
+        margin: 0 20px;
+    }
+	#demo, #demo1 {
+		width: 100px;
+		height: 100px;
+	}
+    #demo2 {
+        width: 333px;
+        height: 333px;
+    }
+</style>
+</head>
+<body>
+<div id="demo"></div>
+<div id="demo1"></div>
+<div id="demo2"></div>
+<script>
+window.onload = function () {
+    require.config({
+        baseUrl: '../src',
+        paths: {
+            annular: './annular-progress/annular-progress'
+        }
+    });
+
+    require(['annular'], function(annular) {
+        var colorIndex = 0;
+        var color = [
+            '#ff7f50', '#87cefa', '#da70d6', '#32cd32', '#6495ed', 
+            '#ff69b4', '#ba55d3', '#cd5c5c', '#ffa500', '#40e0d0', 
+            '#1e90ff', '#ff6347', '#7b68ee', '#00fa9a', '#ffd700', 
+            '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0' 
+        ];
+        
+        //demo1
+        var an = annular({
+            targetDom: 'demo',
+            width: 100,
+            max: 100,
+            value: 0
+            // lineWidth: 20,
+            // fontWeight: 'normal'
+        });
+        an.render();
+        var value = 1;
+        function change() {
+            if (value < 100) {
+                setTimeout(function () {
+                    an.setOptions({
+                        value: value
+                    });
+                    change();
+                }, 30);
+                value++;
+            }
+            else {
+               value = 1;
+               an.setOptions({
+                   fcolor: color[colorIndex]
+               });
+               if (colorIndex == color.length - 1) {
+                    colorIndex = 0;
+               }
+               colorIndex++
+               change();
+            }
+        }
+        change();
+
+
+        //demo2
+        var an1 = annular({
+            targetDom: 'demo1',
+            width: 100, //圆环的直径
+            lineWidth: 20, //环的宽
+            fcolor: '#D87A80', //已完成颜色
+            unfcolor: '#ccc', //为完成颜色
+            max: 373, //总数
+            value: 277 //已完成数
+            //字体设置同css font属性设置
+            // fontStyle: 'italic',
+            // textColor: '#5ab1ef',
+            // fontSize: 20,
+            // fontFamily: 'Arial',
+            // fontWeight: 'Bold',
+        });
+        an1.render();
+
+
+        //demo3
+        var an2 = annular({
+            targetDom: 'demo2',
+            width: 333,
+            lineWidth: 50,
+            fcolor: '#FFB980',
+            max: 373,
+            value: 199,
+            fontSize: 50,
+            textFormatter: function (max, value) {
+                return value + '/' + max;
+            }
+        });
+        an2.render();
+        var demo2 = 1;
+
+        function testDemo2() {
+            if (demo2 < 373) {
+                if (demo2 === 186) {
+                    an2.setOptions({
+                        fcolor: '#D87A80'
+                    });
+                }
+                setTimeout(function () {
+                    an2.setOptions({
+                        value: demo2
+                    });
+                    testDemo2();
+                }, 10);
+                demo2++;
+            }
+            else {
+               demo2 = 1;
+               an2.setOptions({
+                   fcolor: '#FFB980'
+               });
+               testDemo2();
+            }
+        }
+        testDemo2();
+    });
+    
+    
+}
+    
+    
+</script>
+</body>
+</html>

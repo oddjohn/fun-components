@@ -1,0 +1,21 @@
+{
+  "name": "fun-components",
+  "version": "0.1.0",
+  "description": "some web components for fun",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oddjohn/fun-components.git"
+  },
+  "author": "johnchen",
+  "devDependencies": {
+      "grunt": "~0.4.1",
+      "grunt-contrib-jshint": "~0.6.0",
+      "grunt-contrib-nodeunit": "~0.2.0",
+      "grunt-contrib-uglify": "~0.2.2"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oddjohn/fun-components/issues"
+  },
+  "homepage": "https://github.com/oddjohn/fun-components"
+}
