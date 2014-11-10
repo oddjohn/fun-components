@@ -186,8 +186,8 @@
         return new Annular(options);
     };
 
-    if ( typeof define === 'function' && define.amd ) {
-        define('annular', [], function() {
+    if (typeof define === 'function') {
+        define('annular', [], function () {
             return annular;
         });
     } else {
