@@ -186,7 +186,7 @@
         return new Annular(options);
     };
 
-    if (typeof define === 'function') {
+    if (typeof define === 'function' && (define.amd || define.cmd)) {
         define('annular', [], function () {
             return annular;
         });
