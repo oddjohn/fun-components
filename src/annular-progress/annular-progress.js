@@ -1,6 +1,7 @@
 (function (global) {
     function Annular (options) {
         this.opts = {
+            type: 'annular', //or rise
             targetDom: document.body,
             lineWidth: 20,
             width: 0,
@@ -63,84 +64,108 @@
                 ctx.lineWidth = opts.lineWidth;
                 ctx.strokeStyle = opts.fcolor;
                 
-                var startAngle = -(Math.PI / 2);
+                var startAngle = Math.PI * 3 / 2;
                 var valueRate = opts.value / opts.max;
                 // var radius = (width - opts.lineWidth) / 2;
                 //内圆半径
                 var r = width / 2 - opts.lineWidth;
                 //外圆半径
                 var radius = width / 2;
+                if (opts.type === 'rise') {
+                    if (valueRate === 1) {
+                        ctx.beginPath();
+                        ctx.fillStyle = opts.fcolor;
+                        ctx.arc(position, position, radius, 0, Math.PI * 2, true);
+                        ctx.closePath();
+                        ctx.fill();
+                    } else {
+                        ctx.beginPath();
+                        ctx.fillStyle = opts.fcolor;
+                        ctx.arc(position, position, radius, Math.PI / 2 - Math.PI * valueRate, Math.PI / 2 + Math.PI * valueRate);
+                        ctx.closePath();
+                        ctx.fill();
 
-                if (valueRate === 1) {
-                    ctx.beginPath();
-                    ctx.arc(position, position, radius, 0, Math.PI*2, true);
-                    ctx.arc(position, position, r, 0, Math.PI*2, true);
-                    ctx.fill();
-                    ctx.closePath();
-                } else {
-                    var valueEndAngle = startAngle - Math.PI * 2 * valueRate;
-                    //开始绘制value进度
-                    ctx.beginPath();
-                    ctx.fillStyle = opts.fcolor;
-                    ctx.arc(position, position, radius, startAngle, valueEndAngle, true);
-                    ctx.lineTo(position, position);
-                    ctx.fill();
-                    // ctx.closePath();
-                    // 开始绘制unvalue进度
-                    ctx.beginPath();
-                    ctx.fillStyle = opts.unfcolor; 
-                    ctx.arc(position, position, radius, valueEndAngle, startAngle, true);
-                    ctx.lineTo(position, position);
-                    ctx.fill();
-                    // ctx.closePath();
-
-
-                    ctx.beginPath();
-                    ctx.arc(position, position, r, 0, Math.PI*2, true);
-                    ctx.fillStyle = '#fff';
-                    ctx.fill();
-                    //结束绘制
-                    ctx.closePath();
-
-                    //excanvas fillText扩展
-                    if (!ctx.fillText) {
-                        lib.extend(ctx, {
-                            measureText: function(textToDraw) {  
-                                var hiddenSpan = document.createElement('span');  
-                                hiddenSpan.style.font = this.font;  
-                                hiddenSpan.innerHTML = textToDraw;  
-                                var bodyNode = document.getElementsByTagName('body')[0];  
-                                bodyNode.appendChild(hiddenSpan);  
-                                var width = hiddenSpan.offsetWidth;  
-                                bodyNode.removeChild(hiddenSpan);
-                                return {'width' : width};
-                            },
-                            
-                            fillText: function(textToDraw, x, y) {  
-                                var vmlStr = [];
-                                if (!this.textHeight) {
-                                    var textHeightStr = this.font.split(' ')[2];
-                                    this.textHeight = +textHeightStr.replace('px', '') + 2;
-                                }
-                                var textWidth = this.measureText(textToDraw).width; 
-                                vmlStr.push('<g_vml_:shape style="font:' + this.font + ';',  
-                                              ' color:' + this.fillStyle + ';',  
-                                              ' position:absolute;',  
-                                              ' left:' + (x - textWidth / 2) + 'px;',  
-                                              ' top:' + (y - this.textHeight / 2) + 'px;',  
-                                              ' width:' + textWidth + 'px;',  
-                                              ' height:' + this.textHeight + 'px;"',  
-                                              ' ><g_vml_:textbox inset="0,0,0,0">' + textToDraw,  
-                                              ' </g_vml_:textbox>',  
-                                              '</g_vml_:shape>'); 
-                              
-                                this.element_.insertAdjacentHTML('BeforeEnd', vmlStr.join(''));  
-                            }
-                        });
+                        ctx.beginPath();
+                        ctx.fillStyle = opts.unfcolor;
+                        ctx.arc(position, position, radius, Math.PI / 2 + Math.PI * valueRate, Math.PI / 2 - Math.PI * valueRate);
+                        ctx.closePath();
+                        ctx.fill();
                     }
-                    //绘制文本
-                    renderText(ctx, opts);
+                    
+                } else {
+                    if (valueRate === 1) {
+                        ctx.beginPath();
+                        ctx.arc(position, position, radius, 0, Math.PI * 2, true);
+                        ctx.arc(position, position, r, 0, Math.PI * 2, true);
+                        ctx.fill();
+                        ctx.closePath();
+                    } else {
+                        var valueEndAngle = startAngle - Math.PI * 2 * valueRate;
+                        //开始绘制value进度
+                        ctx.beginPath();
+                        ctx.fillStyle = opts.fcolor;
+                        ctx.arc(position, position, radius, startAngle, valueEndAngle, true);
+                        ctx.lineTo(position, position);
+                        ctx.fill();
+                        // ctx.closePath();
+                        // 开始绘制unvalue进度
+                        ctx.beginPath();
+                        ctx.fillStyle = opts.unfcolor; 
+                        ctx.arc(position, position, radius, valueEndAngle, startAngle, true);
+                        ctx.lineTo(position, position);
+                        ctx.fill();
+                        // ctx.closePath();
+
+
+                        ctx.beginPath();
+                        ctx.arc(position, position, r, 0, Math.PI*2, true);
+                        ctx.fillStyle = '#fff';
+                        ctx.fill();
+                        //结束绘制
+                        ctx.closePath();
+                    }
                 }
+                
+
+                //excanvas fillText扩展
+                if (!ctx.fillText) {
+                    lib.extend(ctx, {
+                        measureText: function(textToDraw) {  
+                            var hiddenSpan = document.createElement('span');  
+                            hiddenSpan.style.font = this.font;  
+                            hiddenSpan.innerHTML = textToDraw;  
+                            var bodyNode = document.getElementsByTagName('body')[0];  
+                            bodyNode.appendChild(hiddenSpan);  
+                            var width = hiddenSpan.offsetWidth;  
+                            bodyNode.removeChild(hiddenSpan);
+                            return {'width' : width};
+                        },
+                        
+                        fillText: function(textToDraw, x, y) {  
+                            var vmlStr = [];
+                            if (!this.textHeight) {
+                                var textHeightStr = this.font.split(' ')[2];
+                                this.textHeight = +textHeightStr.replace('px', '') + 2;
+                            }
+                            var textWidth = this.measureText(textToDraw).width; 
+                            vmlStr.push('<g_vml_:shape style="font:' + this.font + ';',  
+                                          ' color:' + this.fillStyle + ';',  
+                                          ' position:absolute;',  
+                                          ' left:' + (x - textWidth / 2) + 'px;',  
+                                          ' top:' + (y - this.textHeight / 2) + 'px;',  
+                                          ' width:' + textWidth + 'px;',  
+                                          ' height:' + this.textHeight + 'px;"',  
+                                          ' ><g_vml_:textbox inset="0,0,0,0">' + textToDraw,  
+                                          ' </g_vml_:textbox>',  
+                                          '</g_vml_:shape>'); 
+                          
+                            this.element_.insertAdjacentHTML('BeforeEnd', vmlStr.join(''));  
+                        }
+                    });
+                }
+                //绘制文本
+                renderText(ctx, opts);
+                
                 
             } else {
                 //TODO something when browser don't surpport canvas

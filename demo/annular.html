@@ -11,7 +11,7 @@
         float: left;
         margin: 0 20px;
     }
-	#demo, #demo1 {
+	#demo, #demo1, #demo3, #demo4 {
 		width: 100px;
 		height: 100px;
 	}
@@ -25,6 +25,8 @@
 <div id="demo"></div>
 <div id="demo1"></div>
 <div id="demo2"></div>
+<div id="demo3"></div>
+<div id="demo4"></div>
 <script>
 window.onload = function () {
     require.config({
@@ -138,7 +140,58 @@ window.onload = function () {
             }
         }
         testDemo2();
+
+
+        //demo4
+        var an3 = annular({
+            type: 'rise',
+            targetDom: 'demo3',
+            width: 100,
+            // fcolor: '#FFB980',
+            unfcolor: '#ddd',
+            max: 100,
+            value: 16,
+            textColor: '#fff'
+        });
+        an3.render();
+
+        var demo3 = 0;
+        function testDemo3() {
+            if (demo3 < 100) {
+                setTimeout(function () {
+                    an3.setOptions({
+                        value: demo3
+                    });
+                    testDemo3();
+                    demo3++;
+                }, 10);
+            } else {
+                demo3 = 0;
+                testDemo3();
+            }
+        }
+        testDemo3();
+
+        //demo5
+        var an4 = annular({
+            type: 'rise',
+            targetDom: 'demo4',
+            width: 100,
+            fcolor: '#da70d6',
+            unfcolor: '#ddd',
+            max: 335,
+            value: 123,
+            textColor: '#fff'
+        });
+        an4.render();
+
+
+
     });
+
+
+
+    
     
     
 }
